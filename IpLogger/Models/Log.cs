@@ -2,14 +2,14 @@
 
 namespace IpLogger.Models
 {
-    public record Log(IPAddress Address, DateTime DateTime)
+    public record Log(IPAddress Address, DateTime LastAccessedTime)
     {
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
         private const string Separator = ":";
 
         public static bool TryParse(string value, out Log log)
         {
-            log = null;
+            log = null!;
 
             var values = value.Split(Separator, 2);
 
@@ -22,6 +22,11 @@ namespace IpLogger.Models
             log = new Log(ipAddress, dateTime);
 
             return true;
+        }
+
+        public override string ToString()
+        {
+            return $"{Address}:{LastAccessedTime.ToString(DateTimeFormat)}";
         }
     }
 }

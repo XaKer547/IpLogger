@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IpLogger": {
+      "commandName": "Project",
+      "commandLineArgs": "--file-log C:\\Users\\a.panfilov\\Desktop\\logs.txt\r\n--file-output sample\r\n--address-start sample\r\n--address-mask sample\r\n--time-start sample\r\n--time-end sample"
+    }
+  }
+}

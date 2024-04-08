@@ -17,7 +17,7 @@ namespace IpLogger.Services
 
         public IEnumerable<Log> GetLogs(string path)
         {
-            //uint skippedLines = 0;
+            uint skippedLines = 0;
 
             var lines = File.ReadLines(path);
 
@@ -27,13 +27,17 @@ namespace IpLogger.Services
             {
                 if (!Log.TryParse(line, out var log))
                 {
-                    //skippedLines++;
+                    skippedLines++;
+
+                    logger.LogError("Строка не может быть прочитана и будет пропущена");
 
                     continue;
                 }
 
                 logs.Add(log);
             }
+
+            logger.LogInformation($"Прочитано строк: {logs.Count}. Пропущено: {skippedLines}");
 
             return [.. logs];
         }

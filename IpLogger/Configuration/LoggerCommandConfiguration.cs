@@ -1,5 +1,4 @@
-﻿using IpLogger.Console.Commands;
-using IpLogger.Console.Filters;
+﻿using IpLogger.Console.Filters;
 using IpLogger.Services.Interfaces;
 using System.CommandLine;
 using System.Net;

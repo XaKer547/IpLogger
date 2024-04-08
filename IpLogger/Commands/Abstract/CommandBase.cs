@@ -5,11 +5,11 @@ namespace IpLogger.Commands.Abstract
 {
     public abstract class CommandBase(string[] args, ICommandConfiguration configuration)
     {
-        public void Invoke()
+        public int Invoke()
         {
             var command = configuration.ConfigureRootCommand();
 
-            command.Invoke(args);
+            return command.Invoke(args);
         }
     }
 }

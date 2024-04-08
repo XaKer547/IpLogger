@@ -1,8 +1,12 @@
-﻿using IpLogger.Helpers;
-using IpLogger.Models;
-using System.CommandLine;
+﻿using IpLogger.Commands;
+using IpLogger.Configuration;
+using IpLogger.Services;
+using IpLogger.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.CommandLine.Builder;
+using System.CommandLine.IO;
 using System.CommandLine.Parsing;
-using System.Net;
 
 namespace IpLogger
 {
@@ -10,128 +14,87 @@ namespace IpLogger
     {
         static void Main(string[] args)
         {
-            var fileLog = new Option<FileInfo>("--file-log", "Путь к файлу с логами")
+            using var loggerFactory = LoggerFactory.Create(builder =>
             {
-                IsRequired = true,
-            };
-
-            fileLog.AddValidator(result =>
-            {
-                FileInfo file = result.GetValueForOption(fileLog)!;
-
-                if (!file.Exists)
-                    result.ErrorMessage = "Файл с логами не найден или не существует";
+                builder
+                    .AddFilter("Microsoft", LogLevel.Warning)
+                    .AddFilter("System", LogLevel.Warning)
+                    .AddFilter("NonHostConsoleApp.Program", LogLevel.Debug)
+                    .AddConsole();
             });
 
-            var fileOutput = new Option<FileInfo>("--file-output", "Путь к файлу с результатом")
+            var logger = loggerFactory.CreateLogger("ProgramLogger");
+
+            var services = new ServiceCollection();
+
+            services.AddScoped(x => logger);
+
+            services.AddScoped<ILogService, LogService>();
+
+            services.AddTransient<ICommandConfiguration, LoggerCommandConfiguration>();
+
+            services.AddTransient(provider =>
             {
-                IsRequired = true,
-            };
+                var configuration = provider.GetRequiredService<ICommandConfiguration>();
 
-            var addressStart = new Option<IPAddress>("--address-start", "Нижняя граница диапазона адресов, по умолчанию обрабатываются все адреса");
+                return new LoggerCommand(args, configuration);
+            });
 
-            var addressMask = new Option<int>("--address-mask", "Маска подсети, задающая верхнюю границу диапазона десятичное число. " +
-                "В случае, если он не указан, обрабатываются все адреса, начиная с нижней границы диапазона. Параметр нельзя использовать, если не задан address-start.");
+            var serviceProvider = services.BuildServiceProvider();
 
-            var timeStart = new Option<DateOnly>("--time-start", "Нижняя граница временного интервала")
-            {
-                IsRequired = true
-            };
+            var command = serviceProvider.GetRequiredService<LoggerCommand>();
 
-            var timeEnd = new Option<DateOnly>("--time-end", "Верхняя граница временного интервала")
-            {
-                IsRequired = true
-            };
+            command.Invoke();
+            //var parser = new CommandLineBuilder(command.ConfigureRootCommand())
+            //    .UseParseDirective(0xA0)
+            //    .UseHelp()
+            //    .UseSuggestDirective()
+            //    .UseParseErrorReporting(0XA0)
+            //    .UseExceptionHandler((exception, context) =>
+            //    {
+            //        if (exception is OperationCanceledException)
+            //            return;
 
-            var rootCommand = new RootCommand("вывести в файл список IP-адресов из файла журнала, " +
-                "входящих в указанный диапазон с количеством обращений с этого адреса в указанный интервал времени")
-            {
-                fileLog,
-                fileOutput,
-                addressStart,
-                addressMask,
-                timeStart,
-                timeEnd,
-            };
+            //        //    context.Console.ResetTerminalForegroundColor();
+            //        //    context.Console.SetTerminalForegroundRed();
 
-            rootCommand.SetHandler(
-                (fileLogValue, fileOutputValue, addressStartValue, addressMaskValue, timeStartValue, timeEndValue) =>
+            //        context.Console.Error.Write(context.LocalizationResources.ExceptionHandlerHeader());
+            //        context.Console.Error.WriteLine(exception.ToString());
+
+            //        //context.Console.ResetTerminalForegroundColor();
+
+            //        context.ExitCode = 0xA0;
+            //    }, 0xA0);
+
+            //var a = parser.Build();
+
+            //a.Invoke(args);
+        }
+
+        private Parser a()
+        {
+            var parser = new CommandLineBuilder()
+                .UseParseDirective()
+                .UseHelp()
+                .UseSuggestDirective()
+                .UseParseErrorReporting()
+                .UseExceptionHandler((exception, context) =>
                 {
-                    uint skippedLines = 0;
+                    if (exception is OperationCanceledException)
+                        return;
 
-                    var logs = GetLogs(fileLogValue.FullName, ref skippedLines);
+                    //    context.Console.ResetTerminalForegroundColor();
+                    //    context.Console.SetTerminalForegroundRed();
 
-                    FilterByDate(ref logs, timeStartValue, timeEndValue);
+                    context.Console.Error.Write(context.LocalizationResources.ExceptionHandlerHeader());
+                    context.Console.Error.WriteLine(exception.ToString());
 
-                    FilterByAddress(ref logs, addressStartValue, addressMaskValue);
+                    //context.Console.ResetTerminalForegroundColor();
 
-                    SaveFile(logs, fileOutputValue.FullName);
-                },
-                fileLog, fileOutput, addressStart, addressMask, timeStart, timeEnd);
+                    context.ExitCode = 0xA0; ;
+                });
 
-            rootCommand.Invoke(args);
-        }
-
-        private static Log[] GetLogs(string path, ref uint skippedLines)
-        {
-            var lines = File.ReadLines(path);
-
-            var logs = new List<Log>();
-
-            foreach (var line in lines)
-            {
-                if (!Log.TryParse(line, out var log))
-                {
-                    skippedLines++;
-
-                    Console.WriteLine("Строка не может быть обработана и будет пропущена");
-
-                    continue;
-                }
-
-                logs.Add(log);
-            }
-
-            return [.. logs];
-        }
-
-        private static void FilterByAddress(ref Log[] logs, IPAddress? addressStart, int addressMask = default)
-        {
-            //TODO: доделать и провести оптимизацию/рефакторинг
-
-            if (addressMask == default)
-                return;
-
-            var mask = CIDRExtensions.CidrToMask(addressMask);
-
-            var filteredLogs = logs.Where(l => l.Address.IsInRange(addressStart, mask))
-                .ToArray();
-
-            logs = filteredLogs;
-        }
-
-        private static void FilterByDate(ref Log[] logs, DateOnly timeStart, DateOnly timeEnd)
-        {
-            TimeOnly time = new(0);
-
-            var start = timeStart.ToDateTime(time);
-
-            var end = timeEnd.ToDateTime(time);
-
-            var filteredLogs = logs.Where(l => l.LastAccessedTime > start && l.LastAccessedTime < end)
-                .ToArray();
-
-            logs = filteredLogs;
-        }
-
-        private static void SaveFile(Log[] logs, string path)
-        {
-            using var stream = new StreamWriter(path);
-
-            foreach (var log in logs)
-                stream.WriteLine(log);
-
-            Console.WriteLine($"Сохранено строк: {logs.Length}");
+            return parser.Build();
         }
     }
 }

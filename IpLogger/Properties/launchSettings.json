@@ -2,7 +2,7 @@
   "profiles": {
     "IpLogger": {
       "commandName": "Project",
-      "commandLineArgs": "--file-log C:\\Users\\user\\Desktop\\logs.txt\r\n--file-output C:\\Users\\use1r\\Desktop\\logs1.txt\r\n--address-start 192.168.1.0\r\n--address-mask 5\r\n--time-start 10.12.2004\r\n--time-end 10.12.2055"
+      "commandLineArgs": "--file-log C:\\Users\\user\\Desktop\\logs.txt\r\n--file-output C:\\Users\\user\\Desktop\\logs1.txt\r\n--address-start 192.168.1.0\r\n--address-mask 5\r\n--time-start 10.12.2004\r\n--time-end 10.12.2055"
     }
   }
 }

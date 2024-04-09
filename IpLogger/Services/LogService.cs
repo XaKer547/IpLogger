@@ -2,16 +2,17 @@
 using IpLogger.Models;
 using IpLogger.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Data.SqlTypes;
 
 namespace IpLogger.Services
 {
     public class LogService(ILogger logger) : ILogService
     {
-        public IEnumerable<Log> GetLogs(string path, LoggerFilter filter)
+        public async Task<IEnumerable<Log>> GetLogsAsync(string path, LoggerFilter? filter = null)
         {
             uint skippedLines = 0;
 
-            var lines = File.ReadLines(path);
+            var lines = await File.ReadAllLinesAsync(path);
 
             var logs = new List<Log>();
 
@@ -31,18 +32,29 @@ namespace IpLogger.Services
 
             logger.LogInformation($"Прочитано строк: {logs.Count}. Пропущено: {skippedLines}");
 
+            if (filter is null)
+                return logs;
+
             var predicates = filter.GetPredicates()
             .ToArray();
 
             return logs.Where(l => predicates.Any(p => p(l)));
         }
 
-        public void SaveLogs(IEnumerable<Log> logs, string path)
+        public async Task SaveLogsAsync(IEnumerable<Log> logs, string path)
         {
             using var stream = new StreamWriter(path);
 
+            uint writtenLogs = 0;
+
             foreach (var log in logs)
-                stream.WriteLine(log);
+            {
+                await stream.WriteLineAsync(log.ToString());
+
+                writtenLogs++;
+            }
+
+            logger.LogInformation($"Сохранено логов: {writtenLogs}");
         }
     }
 }

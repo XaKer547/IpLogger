@@ -2,6 +2,7 @@
 using IpLogger.Models;
 using IpLogger.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Data.SqlTypes;
 
 namespace IpLogger.Services
 {

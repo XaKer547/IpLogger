@@ -5,7 +5,7 @@ namespace IpLogger.Services.Interfaces
 {
     public interface ILogService
     {
-        IEnumerable<Log> GetLogs(string path, LoggerFilter filter);
-        void SaveLogs(IEnumerable<Log> logs, string path);
+        Task<IEnumerable<Log>> GetLogsAsync(string path, LoggerFilter? filter = null);
+        Task SaveLogsAsync(IEnumerable<Log> logs, string path);
     }
 }

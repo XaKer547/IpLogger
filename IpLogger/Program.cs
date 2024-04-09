@@ -6,14 +6,14 @@ namespace IpLogger
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var host = Console.Hosting.Configuration.CreateHostBuilder(args)
+            var host = Console.Hosting.Configuration.CreateHostBuilder()
                 .Build();
 
             var command = host.Services.GetRequiredService<LoggerCommand>();
 
-            command.Invoke(args);
+            await command.InvokeAsync(args);
         }
     }
 }

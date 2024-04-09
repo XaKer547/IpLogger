@@ -1,4 +1,4 @@
-﻿using IpLogger.Configuration;
+﻿using IpLogger.Commands;
 using IpLogger.Services;
 using IpLogger.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,8 +9,8 @@ namespace IpLogger.Console.Hosting
 {
     public class Configuration
     {
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder() =>
+            Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
                 using var loggerFactory = LoggerFactory.Create(builder =>
@@ -28,7 +28,7 @@ namespace IpLogger.Console.Hosting
 
                 services.AddScoped<ILogService, LogService>();
 
-                services.AddTransient<ICommandConfiguration, LoggerCommandConfiguration>();
+                services.AddTransient<LoggerCommand>();
             });
     }
 }

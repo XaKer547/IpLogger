@@ -7,15 +7,7 @@ namespace IpLogger.Services
 {
     public class LogService(ILogger logger) : ILogService
     {
-        public IEnumerable<Log> FilterLogs(IEnumerable<Log> logs, LoggerFilter filter)
-        {
-            var predicates = filter.GetPredicates()
-                .ToArray();
-
-            return logs.Where(l => predicates.Any(p => p(l)));
-        }
-
-        public IEnumerable<Log> GetLogs(string path)
+        public IEnumerable<Log> GetLogs(string path, LoggerFilter filter)
         {
             uint skippedLines = 0;
 
@@ -29,7 +21,7 @@ namespace IpLogger.Services
                 {
                     skippedLines++;
 
-                    logger.LogError("Строка не может быть прочитана и будет пропущена");
+                    logger.LogWarning("Строка не может быть прочитана и будет пропущена");
 
                     continue;
                 }
@@ -39,7 +31,10 @@ namespace IpLogger.Services
 
             logger.LogInformation($"Прочитано строк: {logs.Count}. Пропущено: {skippedLines}");
 
-            return [.. logs];
+            var predicates = filter.GetPredicates()
+            .ToArray();
+
+            return logs.Where(l => predicates.Any(p => p(l)));
         }
 
         public void SaveLogs(IEnumerable<Log> logs, string path)

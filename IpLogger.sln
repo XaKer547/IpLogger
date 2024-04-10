@@ -5,7 +5,13 @@ VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IpLogger.Console", "IpLogger\IpLogger.Console.csproj", "{16F4FFE5-EEB9-43CB-B4E7-3FE1885F02B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IpLogger.Tests", "IpLogger.Tests\IpLogger.Tests.csproj", "{4B82380D-BD5B-4752-930A-E65ACEA2C303}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IpLogger.Tests", "IpLogger.Tests\IpLogger.Tests.csproj", "{4B82380D-BD5B-4752-930A-E65ACEA2C303}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IpLogger.Application", "IpLogger.Application\IpLogger.Application.csproj", "{09B00F4E-0B85-4D46-B972-A91ADE2D1D45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IpLogger.Domain", "IpLogger.Domain\IpLogger.Domain.csproj", "{C9AAA7A2-72F4-4344-A147-81AF3BBA6E30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IpLogger.DataAccess", "IpLogger.DataAccess\IpLogger.DataAccess.csproj", "{C26764F3-D04B-4C9E-BFE5-D2013426140B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +27,18 @@ Global
 		{4B82380D-BD5B-4752-930A-E65ACEA2C303}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B82380D-BD5B-4752-930A-E65ACEA2C303}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B82380D-BD5B-4752-930A-E65ACEA2C303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09B00F4E-0B85-4D46-B972-A91ADE2D1D45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09B00F4E-0B85-4D46-B972-A91ADE2D1D45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09B00F4E-0B85-4D46-B972-A91ADE2D1D45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09B00F4E-0B85-4D46-B972-A91ADE2D1D45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9AAA7A2-72F4-4344-A147-81AF3BBA6E30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9AAA7A2-72F4-4344-A147-81AF3BBA6E30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9AAA7A2-72F4-4344-A147-81AF3BBA6E30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9AAA7A2-72F4-4344-A147-81AF3BBA6E30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C26764F3-D04B-4C9E-BFE5-D2013426140B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C26764F3-D04B-4C9E-BFE5-D2013426140B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C26764F3-D04B-4C9E-BFE5-D2013426140B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C26764F3-D04B-4C9E-BFE5-D2013426140B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

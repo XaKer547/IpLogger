@@ -1,10 +1,12 @@
 ﻿namespace IpLogger.Console.Commands.Enums
 {
+    [Flags]
     public enum ExitCodes
     {
-        ArgumentError = 0xA0,
-        FileNotFound = 0x2,
-        PathNotFound = 0x3,
-        InvalidData = 0xD,
+        Success = 0x0,
+        FileNotFound = 0x1,
+        PathNotFound = 0x2,
+        ArgumentError = 0x4,
+        InvalidData = 0x8,
     }
 }

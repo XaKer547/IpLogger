@@ -1,21 +1,22 @@
 ﻿using IpLogger.Console.Helpers;
-using IpLogger.Services.Interfaces;
+using IpLogger.Console.Infrastucture;
+using IpLogger.Domain.Interfaces;
 using System.CommandLine;
 
-namespace IpLogger.Commands
+namespace IpLogger.Console.Commands
 {
-    public class LoggerCommand : RootCommand
+    public class LogRootCommand : RootCommand
     {
-        public LoggerCommand(ILogService logService)
+        public LogRootCommand(ILogService logService, LogWriter logWriter)
         {
             Description = "вывести в файл список IP-адресов из файла журнала," +
                 " входящих в указанный диапазон с количеством обращений с этого адреса в указанный интервал времени";
 
             _ = this.AddFileLogOption()
                 .AddFileOututOption()
-                .AddIPAddressOption()
+                .AddIPAddressOptions()
                 .AddTimeIntrevalOptions()
-                .AddLoggerHandler(logService);
+                .AddLogHandler(logService, logWriter);
         }
     }
 }

@@ -5,21 +5,13 @@ namespace IpLogger.Console.Helpers
 {
     public static class OptionExtensions
     {
-        public static RootCommand AddIPAddressOption(this RootCommand command)
+        public static Command AddIPAddressOptions(this Command command)
         {
             var addressStart = OptionDefaults.AddressStart;
 
             var addressMask = OptionDefaults.AddressMask;
 
-            addressMask.AddOtherOptionValidation(addressStart);
-
-            addressMask.AddValidator(result =>
-            {
-                var address = result.GetValueForOption(addressStart)!;
-
-                if (address is null)
-                    result.ErrorMessage = "Отсутсвует параметр --address-start";
-            });
+            addressMask.AddOtherOptionRequiredValidation(addressStart);
 
             command.AddOption(addressStart);
 
@@ -27,7 +19,7 @@ namespace IpLogger.Console.Helpers
 
             return command;
         }
-        public static RootCommand AddFileLogOption(this RootCommand command)
+        public static Command AddFileLogOption(this Command command)
         {
             var fileLog = OptionDefaults.FileLog;
 
@@ -37,7 +29,7 @@ namespace IpLogger.Console.Helpers
 
             return command;
         }
-        public static RootCommand AddFileOututOption(this RootCommand command)
+        public static Command AddFileOututOption(this Command command)
         {
             var fileOutput = OptionDefaults.FileOutput;
 
@@ -47,7 +39,7 @@ namespace IpLogger.Console.Helpers
 
             return command;
         }
-        public static RootCommand AddTimeIntrevalOptions(this RootCommand command)
+        public static Command AddTimeIntrevalOptions(this Command command)
         {
             var timeStart = OptionDefaults.TimeStart;
 
@@ -72,7 +64,9 @@ namespace IpLogger.Console.Helpers
                 }
                 catch (Exception ex)
                 {
-                    result.ErrorMessage = "Не удалось создать конечный файл\n\r";
+                    ExitCodeManager.ExitCode |= Commands.Enums.ExitCodes.PathNotFound;
+
+                    result.ErrorMessage = "Не удалось создать конечный файл\r\n";
                     result.ErrorMessage += ex.Message;
                 }
             });
@@ -90,19 +84,25 @@ namespace IpLogger.Console.Helpers
                 }
                 catch (Exception ex)
                 {
-                    result.ErrorMessage = "Файл с логами не найден или не существует\n\r";
+                    result.ErrorMessage = "Файл с логами не найден или не существует\r\n";
                     result.ErrorMessage += ex.Message;
+
+                    ExitCodeManager.ExitCode |= Commands.Enums.ExitCodes.FileNotFound;
                 }
             });
         }
-        public static void AddOtherOptionValidation(this Option option, Option requiredOption)
+        public static void AddOtherOptionRequiredValidation(this Option option, Option requiredOption)
         {
             option.AddValidator(result =>
             {
                 var address = result.GetValueForOption(requiredOption)!;
 
                 if (address is null)
-                    result.ErrorMessage = "Отсутсвует параметр --address-start";
+                {
+                    result.ErrorMessage = $"Отсутсвует параметр {requiredOption.Name}";
+
+                    ExitCodeManager.ExitCode |= Commands.Enums.ExitCodes.ArgumentError;
+                }
             });
         }
     }

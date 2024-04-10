@@ -1,20 +1,18 @@
-﻿using IpLogger.Console.Filters;
+﻿using IpLogger.Console.Commands.Enums;
+using IpLogger.Console.Infrastucture;
 using IpLogger.Console.Options;
-using IpLogger.Services.Interfaces;
+using IpLogger.Domain.Filters;
+using IpLogger.Domain.Interfaces;
 using System.CommandLine;
 
 namespace IpLogger.Console.Helpers
 {
-    public static class RootCommandExtensions
+    public static class CommandExtensions
     {
-        public static RootCommand AddLoggerHandler(this RootCommand rootCommand, ILogService logService)
+        public static Command AddLogHandler(this Command Command, ILogService logService, LogWriter logWriter)
         {
-            rootCommand.SetHandler(async context =>
+            Command.SetHandler(context =>
             {
-                FileInfo fileLog = context.ParseResult.GetValueForOption(OptionDefaults.FileLog)!;
-
-                FileInfo fileOutput = context.ParseResult.GetValueForOption(OptionDefaults.FileOutput)!;
-
                 var addressStart = context.ParseResult.GetValueForOption(OptionDefaults.AddressStart);
 
                 var addressMask = context.ParseResult.GetValueForOption(OptionDefaults.AddressMask);
@@ -23,7 +21,7 @@ namespace IpLogger.Console.Helpers
 
                 var timeEnd = context.ParseResult.GetValueForOption(OptionDefaults.TimeEnd);
 
-                var filter = new LoggerFilter()
+                var filter = new LogFilter()
                 {
                     AddressStart = addressStart,
                     Cidr = addressMask,
@@ -31,12 +29,18 @@ namespace IpLogger.Console.Helpers
                     TimeEnd = timeEnd,
                 };
 
-                var logs = await logService.GetLogsAsync(fileLog.FullName, filter);
+                var logs = logService.GetLogs();
 
-                await logService.SaveLogsAsync(logs, fileOutput.FullName);
+                var fileOutput = context.ParseResult.GetValueForOption(OptionDefaults.FileOutput)!;
+
+                var filterdLogs = logService.FilterLogs(logs, filter);
+
+                logWriter.SaveLogs(logs, fileOutput.FullName);
+
+                ExitCodeManager.ExitCode = ExitCodes.Success;
             });
 
-            return rootCommand;
+            return Command;
         }
     }
 }

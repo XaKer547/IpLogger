@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace IpLogger.Console.Helpers
+namespace IpLogger.Domain.Helpers
 {
     public static class IPAddressExtensions
     {

@@ -1,4 +1,4 @@
-﻿namespace IpLogger.Console.Filters.Abstract
+﻿namespace IpLogger.Domain.Filters.Abstract
 {
     public abstract class FilterBase<TModel> where TModel : class
     {

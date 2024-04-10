@@ -1,19 +1,27 @@
-﻿using IpLogger.Commands;
+﻿using IpLogger.Console.Commands;
+using IpLogger.Console.Commands.Enums;
+using IpLogger.Console.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using System.CommandLine;
 
-namespace IpLogger
+namespace IpLogger.Console
 {
-    internal class Program
+    public class Program
     {
-        static async Task Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
-            var host = Console.Hosting.Configuration.CreateHostBuilder()
-                .Build();
+            try
+            {
+                var host = Hosting.Configuration.CreateHostBuilder(args)
+               .Build();
 
-            var command = host.Services.GetRequiredService<LoggerCommand>();
+                var command = host.Services.GetRequiredService<LogRootCommand>();
 
-            await command.InvokeAsync(args);
+                await command.InvokeAsync(args);
+            }
+            catch { }
+
+            return (int)ExitCodeManager.ExitCode;
         }
     }
 }

@@ -1,18 +1,18 @@
-﻿using IpLogger.Console.Filters.Abstract;
-using IpLogger.Helpers;
-using IpLogger.Models;
+﻿using IpLogger.Domain.Filters.Abstract;
+using IpLogger.Domain.Helpers;
+using IpLogger.Domain.Models;
 using System.Net;
 
-namespace IpLogger.Console.Filters
+namespace IpLogger.Domain.Filters
 {
-    public class LoggerFilter : FilterBase<Log>
+    public class LogFilter : FilterBase<LogDTO>
     {
         public IPAddress? AddressStart { get; set; }
         public int Cidr { get; set; }
         public DateOnly TimeStart { get; set; }
         public DateOnly TimeEnd { get; set; }
 
-        public override IEnumerable<Predicate<Log>> GetPredicates()
+        public override IEnumerable<Predicate<LogDTO>> GetPredicates()
         {
             if (AddressStart is not null)
             {
